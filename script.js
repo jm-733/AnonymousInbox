@@ -9,46 +9,36 @@ import {
 const submitBtn = document.getElementById("submitBtn");
 
 if (submitBtn) {
-
   submitBtn.addEventListener("click", async () => {
 
     const message = document.getElementById("message").value.trim();
     const paperColor = document.getElementById("paperColor").value;
     const paperStyle = document.getElementById("paperStyle").value;
 
-    if (message === "") {
-      alert("Please write your message.");
+    if (!message) {
+      alert("Please write a confession first.");
       return;
     }
 
     try {
 
       await addDoc(collection(db, "messages"), {
-
-        message,
-        paperColor,
-        paperStyle,
-
+        message: message,
+        paperColor: paperColor,
+        paperStyle: paperStyle,
         reply: "",
-
         status: "pending",
-
         createdAt: serverTimestamp()
-
       });
 
-      alert("Your anonymous message has been sent ❤️");
+      alert("Your confession has been sent anonymously ❤️");
 
       document.getElementById("message").value = "";
 
     } catch (error) {
-
       console.error(error);
-
-      alert("Something went wrong.");
-
+      alert("Failed to send your confession.");
     }
 
   });
-
 }
