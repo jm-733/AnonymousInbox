@@ -1,44 +1,121 @@
-import { db } from "./firebase.js";
-
 import {
-  collection,
-  addDoc,
-  serverTimestamp
+collection,
+addDoc,
+serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
 
-const submitBtn = document.getElementById("submitBtn");
 
-if (submitBtn) {
-  submitBtn.addEventListener("click", async () => {
+import {
+db
+} from "./firebase.js";
 
-    const message = document.getElementById("message").value.trim();
-    const paperColor = document.getElementById("paperColor").value;
-    const paperStyle = document.getElementById("paperStyle").value;
 
-    if (!message) {
-      alert("Please write a confession first.");
-      return;
-    }
 
-    try {
+const message =
+document.getElementById("message");
 
-      await addDoc(collection(db, "messages"), {
-        message: message,
-        paperColor: paperColor,
-        paperStyle: paperStyle,
-        reply: "",
-        status: "pending",
-        createdAt: serverTimestamp()
-      });
 
-      alert("Your confession has been sent anonymously ❤️");
+const sendBtn =
+document.getElementById("sendBtn");
 
-      document.getElementById("message").value = "";
 
-    } catch (error) {
-      console.error(error);
-      alert("Failed to send your confession.");
-    }
+const result =
+document.getElementById("result");
 
-  });
+
+
+sendBtn.onclick = async ()=>{
+
+
+const text = message.value.trim();
+
+
+
+if(!text){
+
+alert("Please write something.");
+
+return;
+
 }
+
+
+
+try{
+
+
+const conversation = await addDoc(
+
+collection(db,"conversations"),
+
+{
+
+createdAt: serverTimestamp(),
+
+status:"waiting"
+
+}
+
+);
+
+
+
+
+await addDoc(
+
+collection(db,"conversations",
+conversation.id,
+"messages"),
+
+{
+
+sender:"anonymous",
+
+text:text,
+
+createdAt:serverTimestamp()
+
+}
+
+);
+
+
+
+const link =
+`${window.location.origin}/chat.html?id=${conversation.id}`;
+
+
+
+result.innerHTML = `
+
+Message sent successfully.
+
+<br><br>
+
+Save this private link:
+
+<br>
+
+<a href="${link}">
+${link}
+</a>
+
+`;
+
+
+
+message.value="";
+
+
+
+}catch(error){
+
+console.error(error);
+
+alert("Error sending message");
+
+}
+
+
+
+};
