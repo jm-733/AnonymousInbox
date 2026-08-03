@@ -1,221 +1,209 @@
-// ===============================
-// FIREBASE IMPORTS
-// ===============================
+import {
+
+collection,
+getDocs,
+addDoc,
+query,
+orderBy,
+serverTimestamp
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
 
 import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
 
+db
 
-import { db } from "./firebase.js";
+}
 
+from "./firebase.js";
 
-// ===============================
-// ELEMENT
-// ===============================
 
-const messageList = document.getElementById("messageList");
 
+const conversationList =
+document.getElementById("conversationList");
 
-// ===============================
-// LOAD MESSAGES
-// ===============================
 
-async function loadMessages() {
+const chatSection =
+document.getElementById("chatSection");
 
 
-    if (!messageList) {
+const adminChatBox =
+document.getElementById("adminChatBox");
 
-        console.error("messageList element not found");
 
-        return;
+const adminReply =
+document.getElementById("adminReply");
 
-    }
 
+const sendAdminReply =
+document.getElementById("sendAdminReply");
 
-    messageList.innerHTML = "Loading messages...";
 
 
-    try {
+let currentConversation = null;
 
 
-        const q = query(
-            collection(db, "messages"),
-            orderBy("createdAt", "desc")
-        );
 
+async function loadConversations(){
 
-        const snapshot = await getDocs(q);
 
+const snapshot =
+await getDocs(
+collection(db,"conversations")
+);
 
-        messageList.innerHTML = "";
 
 
-        if (snapshot.empty) {
+conversationList.innerHTML="";
 
 
-            messageList.innerHTML =
-            "<p>No confessions yet.</p>";
 
+snapshot.forEach((doc)=>{
 
-            return;
 
-        }
+const button =
+document.createElement("button");
 
 
 
-        snapshot.forEach((item) => {
+button.innerHTML =
+"Open Conversation " + doc.id;
 
 
-            const data = item.data();
 
+button.onclick=()=>{
 
-            const div = document.createElement("div");
+openConversation(doc.id);
 
+};
 
-            div.innerHTML = `
 
-                <h3>Anonymous Confession</h3>
 
-                <p>
-                    ${data.message || "No message"}
-                </p>
+conversationList.appendChild(button);
 
 
-                <textarea 
-                    id="reply-${item.id}" 
-                    placeholder="Write reply..."
-                >${data.reply || ""}</textarea>
 
-
-                <br><br>
-
-
-                <button onclick="saveReply('${item.id}')">
-                    Save Reply
-                </button>
-
-
-                <button onclick="deleteMessage('${item.id}')">
-                    Delete
-                </button>
-
-
-                <hr>
-
-            `;
-
-
-            messageList.appendChild(div);
-
-
-        });
-
-
-
-    } catch(error) {
-
-
-        console.error("Firebase Error:", error);
-
-
-        messageList.innerHTML =
-        "<p>Error loading messages.</p>";
-
-
-    }
+});
 
 
 }
 
 
 
-// ===============================
-// SAVE REPLY
-// ===============================
-
-window.saveReply = async function(id) {
+async function openConversation(id){
 
 
-    const reply =
-    document.getElementById(`reply-${id}`).value;
+currentConversation=id;
+
+
+chatSection.style.display="block";
 
 
 
-    try {
+const q=query(
+
+collection(
+db,
+"conversations",
+id,
+"messages"
+),
+
+orderBy("createdAt")
+
+);
 
 
-        await updateDoc(
-            doc(db, "messages", id),
-            {
-                reply: reply,
-                status: "replied"
-            }
-        );
+
+const snapshot =
+await getDocs(q);
 
 
-        alert("Reply saved!");
+
+adminChatBox.innerHTML="";
 
 
-    } catch(error) {
+
+snapshot.forEach((msg)=>{
 
 
-        console.error(error);
+const data =
+msg.data();
 
-        alert("Failed to save reply");
 
 
-    }
+adminChatBox.innerHTML += `
+
+<p>
+
+<b>${data.sender}:</b>
+
+${data.text}
+
+</p>
+
+`;
+
+
+
+});
+
+
+}
+
+
+
+sendAdminReply.onclick=async()=>{
+
+
+if(!currentConversation){
+
+return;
+
+}
+
+
+
+await addDoc(
+
+collection(
+
+db,
+
+"conversations",
+
+currentConversation,
+
+"messages"
+
+),
+
+{
+
+sender:"admin",
+
+text:adminReply.value,
+
+createdAt:serverTimestamp()
+
+}
+
+);
+
+
+
+adminReply.value="";
+
+
+openConversation(currentConversation);
+
 
 
 };
 
 
 
-// ===============================
-// DELETE MESSAGE
-// ===============================
-
-window.deleteMessage = async function(id) {
-
-
-    if(confirm("Delete this confession?")) {
-
-
-        try {
-
-
-            await deleteDoc(
-                doc(db, "messages", id)
-            );
-
-
-            loadMessages();
-
-
-        } catch(error) {
-
-
-            console.error(error);
-
-        }
-
-
-    }
-
-
-};
-
-
-
-// ===============================
-// START
-// ===============================
-
-loadMessages();
+loadConversations();
