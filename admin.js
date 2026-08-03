@@ -1,5 +1,5 @@
 // ===============================
-// IMPORT FIREBASE FUNCTIONS
+// FIREBASE IMPORTS
 // ===============================
 
 import {
@@ -12,6 +12,7 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
 
+
 import { db } from "./firebase.js";
 
 
@@ -23,141 +24,198 @@ const messageList = document.getElementById("messageList");
 
 
 // ===============================
-// LOAD CONFESSIONS
+// LOAD MESSAGES
 // ===============================
 
 async function loadMessages() {
 
-  messageList.innerHTML = "Loading messages...";
 
-  try {
+    if (!messageList) {
 
-    const q = query(
-      collection(db, "messages"),
-      orderBy("createdAt", "desc")
-    );
+        console.error("messageList element not found");
 
-    const snapshot = await getDocs(q);
-
-    messageList.innerHTML = "";
-
-
-    if (snapshot.empty) {
-
-      messageList.innerHTML = "<p>No confessions yet.</p>";
-      return;
+        return;
 
     }
 
 
-    snapshot.forEach((item) => {
-
-      const data = item.data();
-
-      const div = document.createElement("div");
-
-      div.innerHTML = `
-
-        <h3>Anonymous Confession</h3>
-
-        <p>
-          ${data.message}
-        </p>
+    messageList.innerHTML = "Loading messages...";
 
 
-        <textarea 
-          id="reply-${item.id}" 
-          placeholder="Write reply..."
-        >${data.reply || ""}</textarea>
+    try {
 
 
-        <br><br>
+        const q = query(
+            collection(db, "messages"),
+            orderBy("createdAt", "desc")
+        );
 
 
-        <button onclick="saveReply('${item.id}')">
-          Save Reply
-        </button>
+        const snapshot = await getDocs(q);
 
 
-        <button onclick="deleteMessage('${item.id}')">
-          Delete
-        </button>
+        messageList.innerHTML = "";
 
 
-        <hr>
-
-      `;
+        if (snapshot.empty) {
 
 
-      messageList.appendChild(div);
+            messageList.innerHTML =
+            "<p>No confessions yet.</p>";
 
-    });
+
+            return;
+
+        }
 
 
-  } catch(error) {
 
-    console.error(error);
+        snapshot.forEach((item) => {
 
-    messageList.innerHTML =
-      "Error loading messages.";
 
-  }
+            const data = item.data();
+
+
+            const div = document.createElement("div");
+
+
+            div.innerHTML = `
+
+                <h3>Anonymous Confession</h3>
+
+                <p>
+                    ${data.message || "No message"}
+                </p>
+
+
+                <textarea 
+                    id="reply-${item.id}" 
+                    placeholder="Write reply..."
+                >${data.reply || ""}</textarea>
+
+
+                <br><br>
+
+
+                <button onclick="saveReply('${item.id}')">
+                    Save Reply
+                </button>
+
+
+                <button onclick="deleteMessage('${item.id}')">
+                    Delete
+                </button>
+
+
+                <hr>
+
+            `;
+
+
+            messageList.appendChild(div);
+
+
+        });
+
+
+
+    } catch(error) {
+
+
+        console.error("Firebase Error:", error);
+
+
+        messageList.innerHTML =
+        "<p>Error loading messages.</p>";
+
+
+    }
+
 
 }
 
 
 
 // ===============================
-// SAVE ADMIN REPLY
+// SAVE REPLY
 // ===============================
 
 window.saveReply = async function(id) {
 
-  const reply =
+
+    const reply =
     document.getElementById(`reply-${id}`).value;
 
 
-  await updateDoc(doc(db, "messages", id), {
 
-    reply: reply,
-
-    status: "replied"
-
-  });
+    try {
 
 
-  alert("Reply saved!");
+        await updateDoc(
+            doc(db, "messages", id),
+            {
+                reply: reply,
+                status: "replied"
+            }
+        );
+
+
+        alert("Reply saved!");
+
+
+    } catch(error) {
+
+
+        console.error(error);
+
+        alert("Failed to save reply");
+
+
+    }
+
 
 };
 
 
 
 // ===============================
-// DELETE CONFESSION
+// DELETE MESSAGE
 // ===============================
 
 window.deleteMessage = async function(id) {
 
 
-  if(confirm("Delete this confession?")) {
+    if(confirm("Delete this confession?")) {
 
 
-    await deleteDoc(
-      doc(db, "messages", id)
-    );
+        try {
 
 
-    loadMessages();
+            await deleteDoc(
+                doc(db, "messages", id)
+            );
 
 
-  }
+            loadMessages();
+
+
+        } catch(error) {
+
+
+            console.error(error);
+
+        }
+
+
+    }
+
 
 };
 
 
 
 // ===============================
-// START PAGE
+// START
 // ===============================
 
 loadMessages();
