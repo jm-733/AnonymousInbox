@@ -213,3 +213,24 @@ openConversation(currentConversation);
 
 
 loadConversations();
+
+const logoutBtn =
+document.getElementById("logoutBtn");
+
+
+if(logoutBtn){
+
+logoutBtn.onclick = function(){
+
+sessionStorage.removeItem(
+"adminLoggedIn"
+);
+
+
+window.location.href =
+"admin-login.html";
+
+
+};
+
+}
