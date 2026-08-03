@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -9,26 +10,62 @@
 
 <link rel="stylesheet" href="style.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 </head>
+
 
 <body>
 
+
 <div class="form-container">
 
-    <h1>Admin Dashboard</h1>
 
-    <p>Anonymous Confessions</p>
+<h1>Admin Dashboard</h1>
 
-    <div id="messageList">
-        Loading messages...
-    </div>
+
+<div id="conversationList">
+
+Loading conversations...
+
+</div>
+
+
+
+<div id="chatSection" style="display:none;">
+
+
+<h2>Conversation</h2>
+
+
+<div id="adminChatBox">
+
+</div>
+
+
+
+<textarea 
+id="adminReply"
+placeholder="Write admin reply..."
+></textarea>
+
+
+
+<button id="sendAdminReply">
+
+Send Reply
+
+</button>
+
+
+
+</div>
+
+
 
 </div>
 
 
 <script type="module" src="admin.js"></script>
+
 
 </body>
 
