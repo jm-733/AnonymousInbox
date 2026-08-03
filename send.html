@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,56 +10,40 @@
 
 <link rel="stylesheet" href="style.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 </head>
+
 
 <body>
 
+
 <div class="form-container">
 
-<h1>Anonymous Message</h1>
 
-<p>Your identity will never be shown.</p>
+<h1>Anonymous Inbox</h1>
 
-<textarea
+<p>Share your thoughts anonymously.</p>
+
+
+<textarea 
 id="message"
-placeholder="Write your confession here..."
+placeholder="Write your confession..."
 ></textarea>
 
-<label>Paper Color</label>
 
-<select id="paperColor">
-
-<option value="#FFF8A6">Yellow</option>
-<option value="#FFD6E7">Pink</option>
-<option value="#D8FFD8">Green</option>
-<option value="#D9E8FF">Blue</option>
-<option value="#FFFFFF">White</option>
-
-</select>
-
-<label>Paper Style</label>
-
-<select id="paperStyle">
-
-<option value="sticky">Sticky Note</option>
-<option value="paper">Notebook</option>
-<option value="vintage">Vintage</option>
-
-</select>
-
-<button id="submitBtn">
-    Send Anonymously
+<button id="sendBtn">
+Send Message
 </button>
-<br><br>
 
-<a href="index.html" class="btn secondary">
-Back Home
-</a>
+
+<p id="result"></p>
+
 
 </div>
 
+
 <script type="module" src="script.js"></script>
+
+
 </body>
+
 </html>
